@@ -1,0 +1,117 @@
+/* Início Script MYSQL */
+
+/*Criar o banco de dados*/
+CREATE SCHEMA `biblioteca` ;
+use biblioteca;
+
+/*Criação das tabelas*/
+
+CREATE TABLE AUTOR(
+  CodAutor INTEGER NOT NULL AUTO_INCREMENT,
+  Nome VARCHAR(30) NOT NULL,
+  Nascimento DATE NOT NULL,
+  PRIMARY KEY (CodAutor),
+  UNIQUE (Nome, Nascimento) );
+
+CREATE TABLE EDITORA(
+  CodEditora INTEGER NOT NULL AUTO_INCREMENT,
+  Razao VARCHAR(30),
+  Endereco VARCHAR(30),
+  Cidade VARCHAR(30),
+  PRIMARY KEY(CodEditora ) );
+
+CREATE TABLE LIVRO(
+  Titulo VARCHAR(30) NOT NULL,
+  CodAutor INTEGER NOT NULL,
+  CodEditora INTEGER NOT NULL,
+  Valor DECIMAL(13,2),
+  Publicacao DATE,
+  Volume INTEGER,
+  Idioma VARCHAR (15) DEFAULT 'Português',
+  constraint PK_LIVRO PRIMARY KEY (Titulo, CodAutor),
+  constraint FK_Livro_Autor FOREIGN KEY (CodAutor) REFERENCES AUTOR (CodAutor),
+  constraint FK_Livro_Editora FOREIGN KEY (CodEditora) REFERENCES EDITORA (CodEditora),
+  constraint CK_Valor_Livro CHECK (Valor > 10.0) );
+
+CREATE TABLE CATEGORIA (
+  CodCategoria INTEGER NOT NULL  AUTO_INCREMENT,
+  Nome VARCHAR(50),
+PRIMARY KEY (CodCategoria ) );
+
+/*Incluir o campo codCategoria na tabela Livro*/ 
+Alter table livro add codCategoria INTEGER;
+
+/*Inserir a constraint de Foreign Key na tabela livro ligando à categoria*/
+alter table livro add constraint FK_Livro_Categoria FOREIGN KEY (CodCategoria) REFERENCES CATEGORIA (codCategoria);
+
+/*Criação de Indice*/
+create index nomeCategIDX on CATEGORIA (NOME);
+
+Insert into autor (nome, nascimento) values ('George','1977-11-06');
+
+Insert into autor (nascimento, nome) values ('1979-06-30','Carlos');
+
+Insert into autor (nome, nascimento) values ('Manoel Dias' ,'1966-01-02');
+
+Insert into editora (Razao) values ('Cosmos');
+Insert into editora (Razao) values ('Atual');
+Insert into editora (Razao) values ('Atlas');
+Insert into editora (Razao, Cidade) values  ('Abril','Recife');
+
+Insert into livro (titulo, codautor,codeditora,valor,publicacao,volume, idioma)
+values ('TESTE LIVRO 1',1,1,NULL,NULL,NULL,'PORTUGUES');
+
+Insert into livro (titulo,codautor,codeditora)
+values ('TESTE LIVRO 2',1,1);
+
+Insert into livro (titulo, codautor,codeditora)
+values ('TESTE LIVRO 3',1,1);
+
+Insert into categoria (nome) values ('Informática');
+Insert into categoria (nome) values ('Culinária');
+Insert into categoria (nome) values ('Administração');
+Insert into categoria (nome) values ('Engenharia');
+Insert into categoria (nome) values ('Educação Física');
+
+Insert into livro (titulo, codautor,codeditora,codCategoria, idioma) values ('Word Avançado',1,4,1,'PORTUGUES');
+
+Insert into livro (titulo, codautor,codeditora,codCategoria, idioma) values ('Churrasco Filet',1,4,2,'FRANCES');
+
+UPDATE EDITORA
+SET Endereco = 'Av. N.S. de Fátima, 123'   ,
+Cidade = 'São Paulo'
+WHERE CodEditora = 1;
+
+UPDATE LIVRO
+SET Valor = 5
+WHERE CodEditora = 4;
+UPDATE LIVRO
+SET Valor = 10
+WHERE CodEditora = 1;
+
+UPDATE LIVRO
+SET Valor = Valor * 1.1
+where codCategoria = 5;
+
+/*Atualizando para R$ 50,00 os livros da editora atlas, na categoria Informática.*/
+update livro set valor = 50 
+where codCategoria = 1 and codEditora = 4;
+
+update livro set codCategoria = 4  where codEditora = 1;
+
+/*alterar o codEditora do livro teste livro1 para 4 e o valor para 15,00.*/
+update livro
+set codeditora = 4, valor = 15
+where titulo = 'TESTE LIVRO 1' ;
+
+update livro
+set valor = null
+where codCategoria = 2;
+
+update livro set publicacao = '2016-05-01'
+where codEditora = 1;
+
+update livro set publicacao = '2015-05-01'
+where codEditora = 4;
+
+/* fim script */
